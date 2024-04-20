@@ -11,6 +11,7 @@ public class PlayerDataSO : ScriptableObject
     public float dashMaxCounter = 2;
 
     public LayerMask groundLayerMask;
+    public GameObject throwablePrefab;
 
 
 }

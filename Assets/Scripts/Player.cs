@@ -1,9 +1,9 @@
 using System.Collections;
+using System.Net;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    Vector2 startPos;
     Vector2 direction;
     Rigidbody rb;
 
@@ -11,8 +11,14 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform groundCheckTransform;
 
     int dashCounter = 0;
-    bool isDashing = false;
+    bool isFiring = false;
     bool isSlowingDown = false;
+    public Transform throwPosition;
+    public Transform throwMechanism;
+    public Transform pivotTransform;
+
+    Camera mainCamera;
+    float distanceFromCamera;
 
     private void OnEnable()
     {
@@ -21,77 +27,104 @@ public class Player : MonoBehaviour
 
     private void OnEnemyTriggeredWithMe()
     {
+        
         dashCounter = (int)dataSO.dashMaxCounter - 1;
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        mainCamera = Camera.main;
+        distanceFromCamera = mainCamera.transform.position.z;
     }
 
     void Update()
     {
-        if (IsGrounded() && Input.GetMouseButtonDown(0))
+        //if (IsGrounded() && Input.GetMouseButtonDown(0))
+        //{
+        //    dashCounter = 0;
+        //}
+        //if (dashCounter >= dataSO.dashMaxCounter)
+        //{
+        //    return;
+        //}
+        if (Input.GetMouseButtonDown(0))
         {
-            dashCounter = 0;
-        }
-        if (dashCounter >= dataSO.dashMaxCounter)
-        {
-            return;
-        }
-        if (!isDashing && Input.GetMouseButtonDown(0))
-        {
-            startPos = Input.mousePosition;
-            if (!IsGrounded())
-            {
-                Time.timeScale = dataSO.slowDownFactor;
-                Time.fixedDeltaTime = 0.02f * Time.timeScale; // Fizik adýmlarýný da yavaþlatmak için
-                isSlowingDown = true;
-            }
-        }
-        else if (!isDashing && Input.GetMouseButtonUp(0))
-        {
-            Vector2 endPos = Input.mousePosition;
-            direction = endPos - startPos;
+            throwMechanism.gameObject.SetActive(true);
+           
+            
 
-            if (direction.magnitude >= dataSO.minSwipeDistance)
-            {
-                direction.Normalize();
-                
-                StartCoroutine(Dash(direction));
-                
-            }
+            //if (!IsGrounded())
+            //{
+            //    Time.timeScale = dataSO.slowDownFactor;
+            //    Time.fixedDeltaTime = 0.02f * Time.timeScale; // Fizik adýmlarýný da yavaþlatmak için
+            //    isSlowingDown = true;
+            //}
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            throwMechanism.gameObject.SetActive(false);
 
-            Time.timeScale = 1f; // Zaman ölçeðini tekrar normal hýza döndür
-            Time.fixedDeltaTime = 0.02f; // Normal fizik adýmlarýna geri dön
-            isSlowingDown = false;
+            Vector3 endPos = Camera.main.ScreenToWorldPoint( Input.mousePosition);
+            //direction = endPos - mouseClickedPos;
+
+            //if (direction.magnitude >= dataSO.minSwipeDistance)
+            //{
+            //    direction.Normalize();
+                
+            //    StartCoroutine(Fire(direction));
+                
+            //}
+
+            //Time.timeScale = 1f; // Zaman ölçeðini tekrar normal hýza döndür
+            //Time.fixedDeltaTime = 0.02f; // Normal fizik adýmlarýna geri dön
+            //isSlowingDown = false;
         }
 
         // Eðer zamaný yavaþlatýyoruz ve fare basýlý deðilse, hýzý geri döndür
-        if (isSlowingDown && !Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
-            Time.timeScale = 1f; // Zaman ölçeðini tekrar normal hýza döndür
-            Time.fixedDeltaTime = 0.02f; // Normal fizik adýmlarýna geri dön
-            isSlowingDown = false;
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 10;
+            Vector3 mouseClickedPos = mainCamera.ScreenToWorldPoint(mousePos);
+            //mouseClickedPos.z = distanceFromCamera;
+            direction = mouseClickedPos - pivotTransform.position;
+
+            // Draw a line between click position and transform position
+            //Debug.DrawLine(pivotTransform.position, mouseClickedPos, Color.red, 1f);
+            throwMechanism.rotation = Quaternion.LookRotation(direction.normalized);
+
+            //Time.timeScale = 1f; // Zaman ölçeðini tekrar normal hýza döndür
+            //Time.fixedDeltaTime = 0.02f; // Normal fizik adýmlarýna geri dön
+            //isSlowingDown = false;
+            //Vector3 direction = mouseClickedPos - (Vector2)pivotTransform.position;
+
         }
     }
 
-    IEnumerator Dash(Vector2 dashDirection)
+    private void CreateThrowable()
+    {
+        //Instantiate(dataSO.throwablePrefab, throwPosition.position, Quaternion.identity);
+
+    }
+
+    IEnumerator Fire(Vector2 fireDirection)
     {
         dashCounter++;
-        isDashing = true;
-        float timer = 0f;
+        isFiring = true;
 
-        while (timer < dataSO.dashDuration)
-        {
-            rb.velocity = dashDirection * (dataSO.dashDistance / dataSO.dashDuration);
-            timer += Time.deltaTime;
-            yield return null;
-        }
+        yield return new WaitForSeconds(0);
+        //float timer = 0f;
+        //while (timer < dataSO.dashDuration)
+        //{
+        //    rb.velocity = fireDirection * (dataSO.dashDistance / dataSO.dashDuration);
+        //    timer += Time.deltaTime;
+        //    yield return null;
+        //}
 
-        // After the dash duration, continue moving in the dash direction
-        rb.velocity = dashDirection * (dataSO.dashDistance / dataSO.dashDuration);
-        isDashing = false;
+        //// After the dash duration, continue moving in the dash direction
+        //rb.velocity = fireDirection * (dataSO.dashDistance / dataSO.dashDuration);
+        isFiring = false;
     }
 
     bool IsGrounded()

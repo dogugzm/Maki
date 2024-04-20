@@ -17,6 +17,9 @@ MonoBehaviour:
   dashDuration: 0.1
   slowDownFactor: 0.1
   groundCheckRadius: 0.1
+  dashMaxCounter: 2
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  throwablePrefab: {fileID: 6391751365090132416, guid: 118621d2984d19f4f8fc6d99743acf30,
+    type: 3}
