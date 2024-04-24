@@ -31,7 +31,6 @@ public class Environment : MonoBehaviour
 
     private void InstantiateEnvironmentPart()
      {
-        Debug.Log("HERE");
         GameObject instantiated = Instantiate(environmentData.EnvironmentPart, instantiatedParts[^1].position + new Vector3(100, 0, 0), Quaternion.identity);
         instantiated.transform.SetParent(transform);
         instantiatedParts.Add(instantiated.transform);
