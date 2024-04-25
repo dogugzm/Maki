@@ -18,6 +18,8 @@ MonoBehaviour:
   slowDownFactor: 0.1
   groundCheckRadius: 0.1
   dashMaxCounter: 2
+  speed: 10
+  jumpPower: 20
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
