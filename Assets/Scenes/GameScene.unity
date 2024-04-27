@@ -406,7 +406,7 @@ Transform:
   m_GameObject: {fileID: 336149701}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.982, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -442,7 +442,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.027522001, y: 0.027522001, z: 0.027522001}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 336149702}
@@ -464,7 +464,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -1030,6 +1030,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1705327653}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1477599736 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5368869428548717027, guid: a66c7697d3d1c844e82aa26243dbfb29,
+    type: 3}
+  m_PrefabInstance: {fileID: 499501061}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1656333352
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,6 +1233,8 @@ MonoBehaviour:
   throwPosition: {fileID: 848183045}
   throwMechanism: {fileID: 8360985594496868360}
   pivotTransform: {fileID: 1231688869}
+  animator: {fileID: 1477599736}
+  currentState: 0
 --- !u!54 &1705327655
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -15,6 +15,5 @@ public class PlayerDataSO : ScriptableObject
 
     public LayerMask groundLayerMask;
     public GameObject throwablePrefab;
-
-
+    public float maxRotationSpeed;
 }

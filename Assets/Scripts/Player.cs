@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.Windows;
 using Input = UnityEngine.Input;
 
+public enum PlayerStates
+{
+    RUN,
+    JUMP,
+    ATTACK
+}
+
 public class Player : MonoBehaviour
 {
     Vector2 direction;
@@ -16,6 +23,8 @@ public class Player : MonoBehaviour
     public Transform throwMechanism;
     public Transform pivotTransform;
 
+    [SerializeField] private Animator animator;
+
     private int throwableCount;
 
     Camera mainCamera;
@@ -23,6 +32,10 @@ public class Player : MonoBehaviour
     private Vector2 _input;
     private Vector3 _movementVector;
 
+    public PlayerStates currentState;
+
+
+    #region EVENT
     private void OnEnable()
     {
         Enemy.OnEnemyTriggeredPlayer += OnEnemyTriggeredWithMe;
@@ -44,93 +57,119 @@ public class Player : MonoBehaviour
     {
 
 
-    }
+    } 
+    #endregion
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         mainCamera = Camera.main;
         distanceFromCamera = mainCamera.transform.position.z;
+        currentState = PlayerStates.RUN;
     }
 
     void Update()
     {
-        //Cleanerway to get input
         _input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        if (Input.GetButtonDown("Jump") && IsGrounded())
-        {
-            rb.AddForce(Vector3.up * dataSO.jumpPower, ForceMode.Impulse);
-        }
 
         RotationControl();
 
 
-        if (throwableCount != 0)
+        switch (currentState)
         {
-            return;
+            case PlayerStates.RUN:
+                animator.SetBool("IsJumping", false);
+
+                if (Input.GetButtonDown("Jump") && IsGrounded())
+                {
+                    currentState = PlayerStates.JUMP;
+                    rb.AddForce(Vector3.up * dataSO.jumpPower, ForceMode.Impulse);
+                }
+
+                break;
+            case PlayerStates.JUMP:
+                StartCoroutine(JumpCoroutine());
+                break;
+            case PlayerStates.ATTACK:
+                if (throwableCount != 0)
+                {
+                    return;
+                }
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    throwMechanism.gameObject.SetActive(true);
+                }
+
+                if (Input.GetMouseButton(0))
+                {
+                    Vector3 mousePos = Input.mousePosition;
+                    mousePos.z = 10;
+                    Vector3 mouseClickedPos = mainCamera.ScreenToWorldPoint(mousePos);
+                    direction = mouseClickedPos - pivotTransform.position;
+
+                    throwMechanism.rotation = Quaternion.LookRotation(direction.normalized);
+
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    throwMechanism.gameObject.SetActive(false);
+
+                    Instantiate(dataSO.throwablePrefab, throwPosition.position, throwMechanism.rotation);
+                    throwableCount++;
+                }
+                break;
+            default:
+                break;
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            throwMechanism.gameObject.SetActive(true);
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 mousePos = Input.mousePosition;
-            mousePos.z = 10;
-            Vector3 mouseClickedPos = mainCamera.ScreenToWorldPoint(mousePos);
-            direction = mouseClickedPos - pivotTransform.position;
-
-            throwMechanism.rotation = Quaternion.LookRotation(direction.normalized);
-
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            throwMechanism.gameObject.SetActive(false);
-
-            Instantiate(dataSO.throwablePrefab, throwPosition.position, throwMechanism.rotation);
-            throwableCount++;
-        }
     }
 
-    private void RotationControl()
+    IEnumerator JumpCoroutine()
     {
-        if (_input.x > 0)
+        animator.SetBool("IsJumping", true);
+
+        yield return new WaitForSeconds(0.2f); // Adjust the duration as needed
+
+        if (IsGrounded())
         {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, 90, transform.rotation.z);
-        }
-        else if (_input.x < 0)
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, 270, transform.rotation.z);
-        }
-        else
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, 90, transform.rotation.z);
+            currentState = PlayerStates.RUN;
         }
     }
 
     void FixedUpdate()
     {
-        //Keep the movement vector aligned with the player rotation
-        _movementVector = Mathf.Abs(_input.x) * transform.forward * dataSO.speed;
-        //Apply the movement vector to the rigidbody without effecting gravity
+        _movementVector = dataSO.speed * Mathf.Abs(_input.x) * transform.forward;
         rb.velocity = new Vector3(_movementVector.x, rb.velocity.y, rb.velocity.z);
     }
 
-    // 'moveCharacter' Function for moving the game object
-    void MoveCharacter(Vector3 _direction)
+    //TODO: dotween ile smooth rotation
+    private void RotationControl()
     {
-        // We multiply the 'speed' variable to the Rigidbody's velocity...
-        // and also multiply 'Time.fixedDeltaTime' to keep the movement consistant on all devices
-        rb.velocity = dataSO.speed * Time.fixedDeltaTime * _direction;
+        if (_input.x > 0)
+        {
+            transform.rotation = Quaternion.Euler(transform.rotation.x, 90, transform.rotation.z);
+            animator.speed = 1.3f;
+        }
+        else if (_input.x < 0)
+        {
+            transform.rotation = Quaternion.Euler(transform.rotation.x, 270, transform.rotation.z);
+            animator.speed = 1.3f;
+
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(transform.rotation.x, 90, transform.rotation.z);
+            animator.speed = 1f;
+        }
     }
 
     bool IsGrounded()
     {
         // Karakterin altýnda bir Sphere Collider varsa ve yerde ise true döndür
         Collider[] colliders = Physics.OverlapSphere(groundCheckTransform.position, dataSO.groundCheckRadius, dataSO.groundLayerMask);
+    
         return colliders.Length > 0;
     }
 
