@@ -3,6 +3,10 @@ using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Windows;
 using Input = UnityEngine.Input;
+using UnityEngine.Animations.Rigging;
+using Unity.Burst.Intrinsics;
+using static Unity.VisualScripting.Member;
+using static UnityEngine.GraphicsBuffer;
 
 public enum PlayerStates
 {
@@ -24,6 +28,12 @@ public class Player : MonoBehaviour
     public Transform pivotTransform;
 
     [SerializeField] private Animator animator;
+    [SerializeField] private MultiAimConstraint spineIK;
+    [SerializeField] private MultiAimConstraint handIK;
+    [SerializeField] private MultiAimConstraint armIK;
+    [SerializeField] private MultiAimConstraint headIK;
+
+
 
     private int throwableCount;
 
@@ -33,7 +43,9 @@ public class Player : MonoBehaviour
     private Vector3 _movementVector;
 
     public PlayerStates currentState;
+    public Transform mouseTr;
 
+    float cameraZ;
 
     #region EVENT
     private void OnEnable()
@@ -57,7 +69,7 @@ public class Player : MonoBehaviour
     {
 
 
-    } 
+    }
     #endregion
 
     void Start()
@@ -66,6 +78,42 @@ public class Player : MonoBehaviour
         mainCamera = Camera.main;
         distanceFromCamera = mainCamera.transform.position.z;
         currentState = PlayerStates.RUN;
+        SetAimConstraint(spineIK);
+        SetAimConstraint(handIK);
+        SetAimConstraint(armIK);
+        SetAimConstraint(headIK);
+
+
+        cameraZ = mainCamera.transform.position.z;
+    }
+
+    public void SetAimTo(float weight, float overTime)
+    {
+        float layerWeight = animator.GetLayerWeight(1);
+        animator.SetLayerWeight(1, Mathf.Lerp(layerWeight, weight, overTime));
+
+        //float startTime = Time.time;
+        //while (Time.time < startTime + overTime)
+        //{           
+        //    Mathf.Lerp(spineIK.weight, weight, (Time.time - startTime) / overTime);
+        //    Mathf.Lerp(armIK.weight, weight, (Time.time - startTime) / overTime);
+        //    Mathf.Lerp(handIK.weight, weight, (Time.time - startTime) / overTime);
+        //    yield return null;
+        //}
+        spineIK.weight = weight;
+        armIK.weight = weight;
+        handIK.weight = weight;
+        headIK.weight = weight;
+
+    }
+
+    private void SetAimConstraint(MultiAimConstraint aim)
+    {
+        var data = aim.data.sourceObjects;
+        data.Clear();
+        data.Add(new WeightedTransform(mouseTr, 1));
+        aim.data.sourceObjects = data;
+        aim.GetComponentInParent<RigBuilder>().Build();
     }
 
     void Update()
@@ -74,38 +122,46 @@ public class Player : MonoBehaviour
 
         RotationControl();
 
-
         switch (currentState)
         {
             case PlayerStates.RUN:
-                animator.SetBool("IsJumping", false);
-
+                SetAimTo(0, Time.deltaTime * 2);
                 if (Input.GetButtonDown("Jump") && IsGrounded())
                 {
-                    currentState = PlayerStates.JUMP;
                     rb.AddForce(Vector3.up * dataSO.jumpPower, ForceMode.Impulse);
+                    currentState = PlayerStates.JUMP;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    currentState = PlayerStates.ATTACK;
                 }
 
                 break;
             case PlayerStates.JUMP:
                 StartCoroutine(JumpCoroutine());
+                if (Input.GetMouseButtonDown(0))
+                {
+                    currentState = PlayerStates.ATTACK;
+                }
+
                 break;
             case PlayerStates.ATTACK:
+
+                SetAimTo(1, Time.deltaTime * 2);
+
                 if (throwableCount != 0)
                 {
                     return;
                 }
-
-                if (Input.GetMouseButtonDown(0))
-                {
-                    throwMechanism.gameObject.SetActive(true);
-                }
+                throwMechanism.gameObject.SetActive(true);
 
                 if (Input.GetMouseButton(0))
                 {
                     Vector3 mousePos = Input.mousePosition;
-                    mousePos.z = 10;
+                    mousePos.z = -cameraZ;
                     Vector3 mouseClickedPos = mainCamera.ScreenToWorldPoint(mousePos);
+                    mouseTr.position = new Vector3(mouseClickedPos.x, mouseClickedPos.y, 0);
+
                     direction = mouseClickedPos - pivotTransform.position;
 
                     throwMechanism.rotation = Quaternion.LookRotation(direction.normalized);
@@ -118,6 +174,7 @@ public class Player : MonoBehaviour
 
                     Instantiate(dataSO.throwablePrefab, throwPosition.position, throwMechanism.rotation);
                     throwableCount++;
+                    currentState = PlayerStates.RUN;
                 }
                 break;
             default:
@@ -134,7 +191,18 @@ public class Player : MonoBehaviour
 
         if (IsGrounded())
         {
-            currentState = PlayerStates.RUN;
+            if (Input.GetMouseButton(0))
+            {
+                animator.SetBool("IsJumping", false);
+
+                currentState = PlayerStates.ATTACK;
+            }
+            else
+            {
+                animator.SetBool("IsJumping", false);
+
+                currentState = PlayerStates.RUN;
+            }
         }
     }
 
@@ -169,7 +237,7 @@ public class Player : MonoBehaviour
     {
         // Karakterin altýnda bir Sphere Collider varsa ve yerde ise true döndür
         Collider[] colliders = Physics.OverlapSphere(groundCheckTransform.position, dataSO.groundCheckRadius, dataSO.groundLayerMask);
-    
+
         return colliders.Length > 0;
     }
 
