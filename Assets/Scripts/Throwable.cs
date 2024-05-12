@@ -33,7 +33,6 @@ public class Throwable : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            Time.timeScale = 0.1f;
 
         }
 
@@ -53,7 +52,6 @@ public class Throwable : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            Time.timeScale = 1f;
             rb.velocity = Vector3.zero;
             attackCounter = 0;
             rb.AddForce(transform.forward * dataSO.forcePower);

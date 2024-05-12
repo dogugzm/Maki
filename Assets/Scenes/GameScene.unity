@@ -485,6 +485,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -610,6 +611,31 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e61628d3a0e081469e7b26dcd216e32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <SourceMode>k__BackingField: 0
+  <LowColor>k__BackingField: {r: 0, g: 0, b: 1, a: 1}
+  <HighColor>k__BackingField: {r: 1, g: 0, b: 0, a: 1}
+  <SplitLevel>k__BackingField: 0.5
+  <BlackColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+  <BlackLevel>k__BackingField: 0.05
+  <WhiteColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <WhiteLevel>k__BackingField: 0.95
+  <ContourColor>k__BackingField: {r: 0, g: 0, b: 0, a: 1}
+  <DitherType>k__BackingField: 1
+  <DitherStrength>k__BackingField: 0.25
+  <Shader>k__BackingField: {fileID: -6465566751694194690, guid: 5d0f93ba092e5a545bab40b50ba2861e,
+    type: 3}
 --- !u!1 &336149701
 GameObject:
   m_ObjectHideFlags: 0
@@ -2122,18 +2148,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c14118adc12c3843b3951bce8e4c707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataSO: {fileID: 11400000, guid: 955c535b3dbc6ff43833290ff9e113e5, type: 2}
-  groundCheckTransform: {fileID: 336149702}
-  throwPosition: {fileID: 848183045}
-  throwMechanism: {fileID: 8360985594496868360}
-  pivotTransform: {fileID: 1231688869}
-  animator: {fileID: 5368869428108460518}
-  spineIK: {fileID: 266574920}
-  handIK: {fileID: 1568378621}
-  armIK: {fileID: 1590550200}
-  headIK: {fileID: 386843047}
   currentState: 0
   mouseTr: {fileID: 86700046}
+  pivotTransform: {fileID: 1231688869}
+  throwMechanism: {fileID: 8360985594496868360}
+  throwPosition: {fileID: 848183045}
+  animator: {fileID: 5368869428108460518}
+  armIK: {fileID: 1590550200}
+  dataSO: {fileID: 11400000, guid: 955c535b3dbc6ff43833290ff9e113e5, type: 2}
+  groundCheckTransform: {fileID: 336149702}
+  handIK: {fileID: 1568378621}
+  headIK: {fileID: 386843047}
+  spineIK: {fileID: 266574920}
 --- !u!54 &1705327655
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2280,18 +2306,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c14118adc12c3843b3951bce8e4c707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataSO: {fileID: 11400000, guid: 955c535b3dbc6ff43833290ff9e113e5, type: 2}
-  groundCheckTransform: {fileID: 1350101631}
-  throwPosition: {fileID: 1459935207}
-  throwMechanism: {fileID: 1030601039}
-  pivotTransform: {fileID: 1846129078}
-  animator: {fileID: 1876126024}
-  spineIK: {fileID: 0}
-  handIK: {fileID: 0}
-  armIK: {fileID: 0}
-  headIK: {fileID: 0}
   currentState: 0
   mouseTr: {fileID: 0}
+  pivotTransform: {fileID: 1846129078}
+  throwMechanism: {fileID: 1030601039}
+  throwPosition: {fileID: 1459935207}
+  animator: {fileID: 1876126024}
+  armIK: {fileID: 0}
+  dataSO: {fileID: 11400000, guid: 955c535b3dbc6ff43833290ff9e113e5, type: 2}
+  groundCheckTransform: {fileID: 1350101631}
+  handIK: {fileID: 0}
+  headIK: {fileID: 0}
+  spineIK: {fileID: 0}
 --- !u!136 &1868012649
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -1,12 +1,11 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public static Action OnEnemyTriggeredPlayer;
     [SerializeField] private PlayerDataSO playerDataSO;
-    public static Action OnEnemyTriggeredPlayer; 
 
     private IEnumerator OnTriggerEnter(Collider other)
     {
@@ -16,10 +15,7 @@ public class Enemy : MonoBehaviour
             Time.timeScale = 0f;
             yield return new WaitForSecondsRealtime(playerDataSO.slowDownFactor);
             Time.timeScale = 1f;
-
             Destroy(gameObject);
-
         }
     }
-
 }

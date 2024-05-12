@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e61dde55f40d3c43982803c732dbdce, type: 3}
   m_Name: ArrowData
   m_EditorClassIdentifier: 
-  forcePower: 1000
+  forcePower: 2000
