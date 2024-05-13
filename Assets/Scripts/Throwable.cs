@@ -7,6 +7,7 @@ public class Throwable : MonoBehaviour
     Rigidbody rb;
     [SerializeField] ThrowableSO dataSO;
     public static Action ThrowableDestroyed;
+    public static Action<Vector3> ThrowableHitted;
 
     Vector3 direction;
     private int attackCounter;
@@ -25,7 +26,6 @@ public class Throwable : MonoBehaviour
 
     private void Update()
     {
-
         if (attackCounter==0)
         {
             return;
@@ -71,6 +71,7 @@ public class Throwable : MonoBehaviour
 
         if (other.CompareTag("Enemy"))
         {
+            ThrowableHitted?.Invoke(other.transform.position);
             attackCounter = 1;
             Destroy(other.gameObject);
         }
