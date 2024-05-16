@@ -1,3 +1,4 @@
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class RunState : State
@@ -10,7 +11,8 @@ public class RunState : State
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Here run" + entity + stateMachine + name);
+        Time.timeScale = 1f;
+        entity.SetIKAimTo(0, Time.deltaTime * 2);
     }
 
     public override void Exit()
@@ -21,7 +23,13 @@ public class RunState : State
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+        if (Input.GetMouseButtonUp(0) && entity.IsGrounded())
+        {
+            stateMachine.ChangeState(entity.JumpState);
+        }
     }
+
+    
 
     public override void PhysicalUpdate()
     {

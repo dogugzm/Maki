@@ -2187,6 +2187,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec89f665b12117c4087d03da665f86ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 5368869428108460518}
+  armIK: {fileID: 1590550200}
+  handIK: {fileID: 1568378621}
+  headIK: {fileID: 386843047}
+  spineIK: {fileID: 266574920}
+  groundCheckTransform: {fileID: 336149702}
+  dataSO: {fileID: 11400000, guid: 955c535b3dbc6ff43833290ff9e113e5, type: 2}
 --- !u!4 &1770125395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6297854906677940197, guid: c3f5be6a2b69a3c4f87e239f7f02a62d,
